@@ -51,10 +51,28 @@
                         @else
                             <div class="portlet-body">
                                 <div class="mt-clipboard-container">
+                                    <input type="text" id="mt-source-1" class="form-control" style="display: none;" value="{{$link}}" />
                                     <input type="text" id="mt-target-1" class="form-control" value="{{$link}}" />
-                                    <a href="#subscribe_qrcode" class="btn green" data-toggle="modal">
+                                    <a href="#subscribe_qrcode" class="btn green" data-toggle="modal" id="btn_subscribe_qrcode">
                                         <i class="fa fa-qrcode"></i>
                                     </a>
+                                    @if($is_converter)
+                                        <input type="text" id="mt-source-2" class="form-control" style="display: none;" value="{{$link_sc}}" />
+                                        <span class="btn">
+                                            <select name="convertCode" id="convertCode" class="form-control">
+                                                <option value="00">SS/SSR</option>
+                                                <option value="01">Clash</option>
+                                                <option value="02">ClashR</option>
+                                                <option value="03">Quantumult</option>
+                                                <option value="04">Quantumult X</option>
+                                                <option value="05">Surfboard</option>
+                                                <option value="06">Surge 2</option>
+                                                <option value="07">Surge 3</option>
+                                                <option value="08">Surge 4</option>
+                                                <option value="09">V2Ray</option>
+                                            </select>
+                                        </span>
+                                    @endif
                                     <a href="javascript:exchangeSubscribe();" class="btn blue">
                                         {{trans('home.exchange_subscribe')}}
                                     </a>
@@ -397,6 +415,22 @@
                 layer.close(index);
             });
         }
+
+        // 转换订阅地址
+        $('#convertCode').change(function(){
+            var code = $(this).val();
+            var url = $('#mt-source-1').val();
+            var qrcodeBtn = $('#btn_subscribe_qrcode');
+            if(code != '00'){
+                url = $('#mt-source-2').val()+'/'+code;
+                qrcodeBtn.addClass('disabled');
+                qrcodeBtn.attr("disabled");
+            }else{
+                qrcodeBtn.removeClass('disabled');
+                qrcodeBtn.removeAttr("disabled");
+            }
+            $('#mt-target-1').val(url);
+        });
     </script>
 
     @if(!$nodeList->isEmpty())

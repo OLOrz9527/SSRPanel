@@ -134,6 +134,12 @@ class UserController extends Controller
         // 订阅连接
         $view['link'] = (self::$systemConfig['subscribe_domain'] ? self::$systemConfig['subscribe_domain'] : self::$systemConfig['website_url']) . '/s/' . Auth::user()->subscribe->code;
 
+        // 转换订阅连接
+        $view['link_sc'] = (self::$systemConfig['subscribe_domain'] ? self::$systemConfig['subscribe_domain'] : self::$systemConfig['website_url']) . '/sc/' . Auth::user()->subscribe->code;
+
+        // 是否转换订阅
+        $view['is_converter'] = self::$systemConfig['is_converter'];
+
         // 订阅连接二维码
         $view['link_qrcode'] = 'sub://' . base64url_encode($view['link']) . '#' . base64url_encode(self::$systemConfig['website_name']);
 

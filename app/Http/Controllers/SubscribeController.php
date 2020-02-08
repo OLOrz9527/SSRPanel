@@ -123,6 +123,40 @@ class SubscribeController extends Controller
         return Response::json(['status' => 'success', 'data' => '', 'message' => '操作成功']);
     }
 
+    // 订阅类型转换
+    public function subConverter(Request $request, $code, $convertCode)
+    {
+        // 拼出订阅地址
+        $subUrl = (self::$systemConfig['subscribe_domain'] ? self::$systemConfig['subscribe_domain'] : self::$systemConfig['website_url']) . '/s/' . $code;
+        // convertCode映射表
+        $convertCodeArray = [
+            '01' => 'clash',		//Clash
+            '02' => 'clashr',		//ClashR
+            '03' => 'quan',			//Quantumult
+            '04' => 'quanx',		//Quantumult X
+            '05' => 'surfboard',	//Surfboard
+            '06' => 'surge&ver=2',	//Surge 2
+            '07' => 'surge&ver=3',	//Surge 3
+            '08' => 'surge&ver=4',	//Surge 4
+            '09' => 'v2ray',		//V2Ray
+        ];
+        // 拼出转换地址
+        $convertUrl = (self::$systemConfig['converter_domain'] ? self::$systemConfig['converter_domain'] : self::$systemConfig['website_url']) . '/sub';
+        $url = $convertUrl . '?target=' . $convertCodeArray[$convertCode] . '&url=' . urlencode($subUrl);
+        // 发送http请求
+        $curl = curl_init($url);
+        $header = ['User-Agent: ssrpanel'];// 设置浏览器标识
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, 0); //去掉response头部信息
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true); // 显示输出结果
+
+        $responseText = curl_exec($curl);
+        $contentType = curl_getinfo($curl,CURLINFO_CONTENT_TYPE);//获取content-type
+        curl_close($curl);
+
+        return response($responseText) -> header('content-type', $contentType);
+    }
+
     // 通过订阅码获取订阅信息
     public function getSubscribeByCode(Request $request, $code)
     {

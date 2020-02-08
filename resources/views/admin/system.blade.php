@@ -382,6 +382,27 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            <label for="is_converter" class="col-md-3 control-label">订阅转换</label>
+                                                            <div class="col-md-9">
+                                                                <input type="checkbox" class="make-switch" @if($is_converter) checked @endif id="is_converter" data-on-color="success" data-off-color="danger" data-on-text="启用" data-off-text="关闭">
+                                                                <span class="help-block"> （推荐）提供不同类型的订阅转换 </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                                            <label for="converter_domain" class="col-md-3 control-label">订阅转换地址</label>
+                                                            <div class="col-md-9">
+                                                                <div class="input-group">
+                                                                    <input class="form-control" type="text" name="converter_domain" value="{{$converter_domain}}" id="converter_domain" />
+                                                                    <span class="input-group-btn">
+                                                                        <button class="btn btn-success" type="button" onclick="setConverterDomain()">修改</button>
+                                                                    </span>
+                                                                </div>
+                                                                <<span class="help-block"> 订阅转换服务（<a href='https://github.com/tindy2013/subconverter' target='_blank'>subconverter</a>）的地址，需带http://或https:// </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="col-md-6 col-sm-6 col-xs-12">
                                                             <label for="user_invite_days" class="col-md-3 control-label">邀请码有效期（用户）</label>
                                                             <div class="col-md-9">
                                                                 <div class="input-group">
@@ -1479,6 +1500,25 @@
             }
         });
 
+        // 启用、禁用订阅转换
+        $('#is_converter').on({
+            'switchChange.bootstrapSwitch': function (event, state) {
+                var is_converter = state ? 1 : 0;
+
+                $.post("{{url('admin/setConfig')}}", {
+                    _token: '{{csrf_token()}}',
+                    name: 'is_converter',
+                    value: is_converter
+                }, function (ret) {
+                    layer.msg(ret.message, {time: 1000}, function () {
+                        if (ret.status == 'fail') {
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+
         // 启用、禁用混合订阅
         $('#mix_subscribe').on({
             'switchChange.bootstrapSwitch': function (event, state) {
@@ -2507,6 +2547,23 @@
             });
         }
 
+        // 设置订阅转换地址
+        function setConverterDomain() {
+            var converter_domain = $("#converter_domain").val();
+
+            $.post("{{url('admin/setConfig')}}", {
+                _token: '{{csrf_token()}}',
+                name: 'converter_domain',
+                value: converter_domain
+            }, function (ret) {
+                layer.msg(ret.message, {time: 1000}, function () {
+                    if (ret.status == 'fail') {
+                        window.location.reload();
+                    }
+                });
+            });
+        }
+
         // 设置节点订阅随机展示节点数
         function setRegisterIpLimit() {
             var register_ip_limit = parseInt($("#register_ip_limit").val());
@@ -2789,6 +2846,6 @@
                 });
             });
         }
-        
+
     </script>
 @endsection
